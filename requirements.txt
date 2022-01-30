@@ -1,9 +1,10 @@
 # App
 Flask==2.0.2
 flask-env==2.0.0
-uWSGI==2.0.20
 Flask-SQLAlchemy==2.5.1
+httplib2==0.14.0
 psycopg2-binary==2.9.3
+uWSGI==2.0.20
 
 # Database migrations
 alembic==1.7.3
