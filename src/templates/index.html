@@ -1,0 +1,252 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <link rel="stylesheet" link href="/static/css/article-list-vertical.css">
+    <link rel="icon" type="image/svg" href="/static/images/favicon.svg" />
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <!-- Using jQuery with a CDN -->
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <script src="/static/js/jquery.easy-autocomplete.min.js"></script>
+
+    <!-- CSS file -->
+    <link rel="stylesheet" href="/static/css/easy-autocomplete.min.css">
+
+    <!-- Additional CSS Themes file - not required-->
+    <link rel="stylesheet" href="/static/css/easy-autocomplete.themes.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <title>Vinotéka</title>
+</head>
+
+<body>
+</div>
+    <div class="status-bar">
+        <span>Celkem: {{ wines_total_count }}</span>
+        <span>Druhů: {{ wines_type_count }}</span>
+    </div>
+    <ul class="article-list-vertical">
+        {% if authorized %}
+        <li>
+            <div class="wrap_attribute">
+                <div class="attribute">
+                    <div class="name">Vinařství</div>
+                    <div class="value"><input type="text" id="inputWinery"></div>
+                </div>
+                <div class="attribute">
+                    <div class="name">Odrůda</div>
+                    <div class="value"><input type="text" id="inputVariety"></div>
+                </div>
+                <div class="attribute">
+                    <div class="name">Ročník</div>
+                    <div class="value"><input type="text" id="inputYear"></div>
+                </div>
+                <div class="attribute">
+                    <div class="name">Přívlastek</div>
+                    <div class="value"><input type="text" id="inputAttribute"></div>
+                </div>
+                <div class="attribute">
+                    <div class="name">Cukernatost</div>
+                    <div class="value">
+                        <select id="inputSugar" class="js-example-basic-single" name="state">
+                            <option value="Suché">Suché</option>
+                            <option value="Polosuché">Polosuché</option>
+                            <option value="Sladké">Sladké</option>
+                            <option value="Polosladké">Polosladké</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="attribute">
+                    <div class="name">Počet</div>
+                    <div class="value"><input type="number" id="inputCount" value=0></div>
+                </div>
+                <div class="attribute">
+                    <div class="name"></div>
+                    <div class="value"><input type="button" value="Přidat víno" id="btnSubmit" onclick=createWine()></div>
+                </div>
+            </div>
+        </li>
+        {% endif %}
+        {% for wine in wines %}
+        <li id="li-{{wine.id}}">
+            <div class="{% if wine.count <= 0 %}card-disabled{% else %}card{% endif %}"> {% if authorized %}
+                <input type="button" class="plus" value="+" onclick="incrementWineCounter({{wine.id}});">{% endif %}
+                <div class="wrap_attribute">
+                    <div class="attribute">
+                        <div class="name">Vinařství</div>
+                        <div class="value">{{ wine.winery }}</div>
+                    </div>
+                    <div class="attribute">
+                        <div class="name">Odrůda</div>
+                        <div class="value">{{ wine.variety }}</div>
+                    </div>
+                    <div class="attribute">
+                        <div class="name">Ročník</div>
+                        <div class="value">{{ wine.year }}</div>
+                    </div>
+                    <div class="attribute">
+                        <div class="name">Přívlastek</div>
+                        <div class="value">{{ wine.attribute }}</div>
+                    </div>
+                    <div class="attribute">
+                        <div class="name">Cukernatost</div>
+                        <div class="value">{{ wine.sugar }}</div>
+                    </div>
+                    <div class="attribute">
+                        <div class="name">Počet</div>
+                        <div class="value">
+                            <div id='wine_{{wine.id}}_count'>{{ wine.count }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% if authorized %}
+                <input type="button" class="minus" value="-" onclick="decrementWineCounter({{wine.id}});"> {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
+</body>
+<script>
+    function incrementWineCounter(wine_id) {
+        return $.ajax({
+            type: "PUT",
+            url: '/wine/' + wine_id + '?heslo={{ token }}',
+            contentType: 'application/json',
+            data: JSON.stringify({"count": parseInt($('#wine_' + wine_id + '_count').text()) + 1}),
+            success: function(response) {
+                $('#wine_' + wine_id + '_count').text(response.count);
+            },
+        });
+    }
+
+    function decrementWineCounter(wine_id) {
+        if ((parseInt($('#wine_' + wine_id + '_count').text()) - 1) < 0) {
+            deleteWine(wine_id);
+            return;
+        }
+
+        return $.ajax({
+            type: "PUT",
+            url: '/wine/' + wine_id + '?heslo={{ token }}',
+            contentType: 'application/json',
+            data: JSON.stringify({"count": parseInt($('#wine_' + wine_id + '_count').text()) - 1}),
+            success: function(response) {
+                $('#wine_' + wine_id + '_count').text(response.count);
+            },
+        });
+    }
+
+    function deleteWine(wine_id) {
+        if (confirm("Opravdu chcete víno smazat?") == true) {
+            $.ajax({
+                type: "DELETE",
+                url: '/wine/' + wine_id + '?heslo={{ token }}',
+                success: function(response) {
+                    window.location.reload();
+                },
+            });
+        }
+    }
+
+    function createWine() {
+        let inputData = {
+            winery: $('#inputWinery').val(),
+            variety: $('#inputVariety').val(),
+            year: $('#inputYear').val(),
+            attribute: $('#inputAttribute').val(),
+            sugar: $('#inputSugar').val(),
+            count: $('#inputCount').val(),
+        };
+        console.log(inputData);
+        return $.ajax({
+            type: "POST",
+            url: '/wine?heslo={{ token }}',
+            contentType: 'application/json',
+            data: JSON.stringify(inputData),
+            success: function(response) {
+                window.location.reload();
+            },
+        });
+    }
+    // In your Javascript (external .js resource or <script> tag)
+    $(document).ready(function() {
+        $.ajax({
+            type: "GET",
+            url: '/wine/winery/autocomplete',
+            success: function(response) {
+                let options = {
+                    data: response,
+                    list: {
+                        match: {
+                            enabled: true
+                        }
+                    }
+                };
+                $('#inputWinery').easyAutocomplete(options);
+            },
+        });
+
+        $.ajax({
+            type: "GET",
+            url: '/wine/attribute/autocomplete',
+            success: function(response) {
+                let options = {
+                    data: response,
+                    list: {
+                        match: {
+                            enabled: true
+                        }
+                    }
+                };
+                $('#inputAttribute').easyAutocomplete(options);
+            },
+        });
+
+        $.ajax({
+            type: "GET",
+            url: '/wine/variety/autocomplete',
+            success: function(response) {
+                let options = {
+                    data: response,
+                    list: {
+                        match: {
+                            enabled: true
+                        }
+                    }
+                };
+                $('#inputVariety').easyAutocomplete(options);
+            },
+        });
+        $.ajax({
+            type: "GET",
+            url: '/wine/year/autocomplete',
+            success: function(response) {
+                let options = {
+                    data: response,
+                    list: {
+                        match: {
+                            enabled: true
+                        }
+                    }
+                };
+                $('#inputYear').easyAutocomplete(options);
+            },
+        });
+
+        $('.js-example-basic-single').select2({width: '100%'});
+    });
+
+</script>
+</html>
