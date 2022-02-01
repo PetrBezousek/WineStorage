@@ -6,6 +6,8 @@ EDIT_PASSWORD = os.environ["EDIT_PASSWORD"]
 
 
 class BaseConfig(metaclass=MetaFlaskEnv):
+    """Base configuration for the app. Variables can be overriden with environment variables."""
+
     SQLALCHEMY_POOL_RECYCLE = 299
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -17,9 +19,11 @@ class BaseConfig(metaclass=MetaFlaskEnv):
 
 
 class DevelopmentConfig(BaseConfig):
+    """Development configuration for the app. Variables can be overriden with environment variables."""
+
     DEBUG = True
     SQLALCHEMY_ECHO = True
 
 
 class ProductionConfig(BaseConfig):
-    pass
+    """Production configuration for the app. Variables can be overriden with environment variables."""

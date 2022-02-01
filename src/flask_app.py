@@ -21,7 +21,6 @@ def create_app() -> Flask:
         app.config.from_object(ProductionConfig)
 
     init_database(app)
-
     init_url_rules(app)
     return app
 

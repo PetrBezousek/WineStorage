@@ -1,3 +1,4 @@
+"""Handlers for the index page."""
 from flask import render_template, request
 from flask.views import MethodView
 
@@ -9,7 +10,12 @@ class IndexHandler(MethodView):
     """/"""
 
     @staticmethod
-    def get():
+    def get() -> str:
+        """Get the index page which lists all wines.
+
+        Returns:
+            str: Rendered template.
+        """
         token = request.args.get("heslo")
         wines = []
         wines_total_count = 0
