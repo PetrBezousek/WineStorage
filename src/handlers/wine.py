@@ -14,10 +14,10 @@ class WineHandler(MethodView):
 
     @staticmethod
     def post() -> NoReturn | Response:
-        """Create a new wine. If user is not authorized, abort with 403.
+        """Create a new wine. If a user is not authorized, abort with 403.
 
         Returns:
-            NoReturn | Response: Response with wine's ID or 403 if user is not authorized.
+            NoReturn | Response: Response with wine's ID or 403 if a user is not authorized.
         """
         if request.args.get("heslo") != EDIT_PASSWORD:
             return abort(403)
@@ -43,13 +43,13 @@ class WineIdHandler(MethodView):
 
     @staticmethod
     def put(wine_id: int) -> NoReturn | Response:
-        """Update a wine. If user is not authorized, abort with 403.
+        """Update a wine. If a user is not authorized, abort with 403.
 
         Args:
             wine_id (int): ID of the wine to update.
 
         Returns:
-            NoReturn | Response: Response with wine's ID or 403 if user is not authorized.
+            NoReturn | Response: Response with wine's ID or 403 if a user is not authorized.
         """
         if request.args.get("heslo") != EDIT_PASSWORD:
             return abort(403)
@@ -68,6 +68,11 @@ class WineIdHandler(MethodView):
 
     @staticmethod
     def delete(wine_id: int) -> NoReturn | Response:
+        """Archive a wine. Archived wine is not visible in the listing. If a user is not authorized, abort with 403.
+
+        Returns:
+            NoReturn | Response: Response with a deleted wine's ID or 403 if a user is not authorized.
+        """
         if request.args.get("heslo") != EDIT_PASSWORD:
             return abort(403)
         wine = Wine.query.filter_by(id=wine_id).one_or_none()
@@ -81,6 +86,14 @@ class WineColumnAutocompleteHandler(MethodView):
 
     @staticmethod
     def get(column: str) -> Response:
+        """Get non-archived wines' values for a column. Use result for auto-complete.
+
+        Args:
+            column (str): Database column name.
+
+        Returns:
+            Response: List of values for a column.
+        """
         if hasattr(Wine, column):
             wine_columns = (
                 Wine.query.filter(Wine.is_archived.is_(False))

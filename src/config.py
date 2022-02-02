@@ -11,7 +11,8 @@ class BaseConfig(metaclass=MetaFlaskEnv):
     SQLALCHEMY_POOL_RECYCLE = 299
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # Heroku hack TODO explain more
+    # Heroku provides a DATABASE_URL environment variable with `postgres` as a prefix.
+    # There has to be a dialect + driver according to SQLAlchemy docs
     if os.environ["DATABASE_URL"].startswith("postgres://"):
         os.environ["DATABASE_URL"] = os.environ["DATABASE_URL"].replace("postgres", "postgresql+psycopg2", 1)
 
