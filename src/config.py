@@ -6,7 +6,7 @@ EDIT_PASSWORD = os.environ["EDIT_PASSWORD"]
 
 
 class BaseConfig(metaclass=MetaFlaskEnv):
-    """Base configuration for the app. Variables can be overriden with environment variables."""
+    """Base configuration for the app. Override values with environment variables."""
 
     SQLALCHEMY_POOL_RECYCLE = 299
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -20,11 +20,17 @@ class BaseConfig(metaclass=MetaFlaskEnv):
 
 
 class DevelopmentConfig(BaseConfig):
-    """Development configuration for the app. Variables can be overriden with environment variables."""
+    """Development configuration for the app. Override valueswith environment variables."""
 
     DEBUG = True
     SQLALCHEMY_ECHO = True
 
 
 class ProductionConfig(BaseConfig):
-    """Production configuration for the app. Variables can be overriden with environment variables."""
+    """Production configuration for the app. Override values with environment variables."""
+
+
+class IntegrationTestConfig(BaseConfig):
+    """Integration configuration for the app. Use in the test suite."""
+
+    SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://postgres:password@postgresql-wine-storage-test:5432/wine_storage"

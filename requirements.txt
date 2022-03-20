@@ -12,3 +12,10 @@ Flask-Migrate==2.7.0
 
 # Dev tools
 pre-commit==2.16.0
+
+# Testing
+pytest==7.0.0
+pytest-factoryboy==2.1.0
+pytest-mock==3.7.0
+pytest-randomly==3.11.0
+snapshottest==0.6.0

@@ -17,10 +17,23 @@ services:
       # uwsgi /www/WineStorage/uwsgi.ini
       # DATABASE_URL=postgres://postgres:password@postgresql-wine-storage:5432/wine_storage uwsgi uwsgi.ini
     entrypoint: ["python", "run_dev.py"]  # start the image and remain running
+    depends_on:
+      - postgresql
+      - postgresql-test
     # entrypoint: ["tail", "-f", "/dev/null"]  # start the image and remain running
   postgresql:
     image: postgres:14.1
     container_name: postgresql-wine-storage
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=wine_storage
+    ports:
+      - 3306
+    networks:
+      - dev-net
+  postgresql-test:
+    image: postgres:14.1
+    container_name: postgresql-wine-storage-test
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=wine_storage
