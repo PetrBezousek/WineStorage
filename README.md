@@ -1,31 +1,33 @@
 # WineStorage
 
-Run server:
+Web app for storing wine.
+
+## How-To
+
+### Run locally
 
 ```bash
-DATABASE_URL="mysql+mysqlconnector://root:pass@mariadb-wine-storage/wine_storage"
-```
-
-restart
-
-docker-compose rm -fs
 docker-compose up --build
-
-new migration:
-
-from root directory:
-
 ```
+
+## Create a new migration
+
+```bash
 cd WineStorage/
 FLASK_APP="wsgi.py" flask db revision --autogenerate --message "${message:-No message}" --directory "src/migrations"
 ```
 
-run server
-python run_dev.py
-uwsgi uwsgi.ini --set-placeholder port=$PORT
+## Run tests
 
-import dummy data
+```bash
+# Exec into the wine-storage container (see How-To run locally)
+pytest
+```
 
+## Insert dummy data
+
+```sql
+-- Run this SQL in the PostgreSQL
 INSERT INTO wine (winery, variety, attribute, sugar, year) VALUES
 ('Šilinek', 'Solaris', 'Pozdní sběr', 'Suché', '2019'),
 ('Šilinek', 'Hibernal', 'Pozdní sběr', 'Polosuché', '2019'),
@@ -57,3 +59,4 @@ INSERT INTO wine (winery, variety, attribute, sugar, year) VALUES
 ('Šilinek', 'Cabernet Sauvignon', 'Pozdní sběr', 'Suché', '2017'),
 ('Šilinek', 'Dornfelder', 'Pozdní sběr', 'Suché', '2019'),
 ('Šilinek', 'Ryzlink rýnský', 'Pozdní sběr', 'Suché', '2020');
+```
